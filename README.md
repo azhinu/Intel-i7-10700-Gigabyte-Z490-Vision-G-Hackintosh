@@ -1,12 +1,9 @@
-# Intel-i9-10900-Gigabyte-Z490-Vision-G-Hackintosh
+# Intel-i7-10700-Gigabyte-Z490-Vision-G-Hackintosh
 
-![](Photos/Info.png)
 
-Hello folks, I have successfully installed macOS 10.15.5(initial setup) on my PC.  
 
 Tested working version:
- - macOS Catalina 10.15.5~10.15.7
- - macOS Big Sur (Safari v14.0 No DRM)
+ - macOS Catalina 10.15.7
 
 ## Bootloader
 
@@ -14,20 +11,14 @@ Tested working version:
 
 ## Hardware
 
-- Intel i9-10900 (Locked version)
+- Intel i7-10700 (Locked version)
 - [Gigabyte Z490 Vision G](https://www.gigabyte.com/Motherboard/Z490-VISION-G-rev-1x):
   - Audio: Realtek ALC1220-V
   - 2.5Gb Ethernet: Intel I225-V
-- RAM: 16GB * 2 Kingston 2666 MHz
-- dGPU: [MSI Radeon™ RX 580 ARMOR 8G OC](https://www.msi.com/Graphics-card/Radeon-RX-580-ARMOR-8G-OC/)
-- Wireless chip: Fenvi T919
-- Display: ASUS MX27UC 4k Display
-- SMBIOS: iMac20,2
-- BIOS version: F6
+- No dGPU
+- BIOS: F8
+- SMBIOS: iMac20,1
 
-## Benchmark
-
-https://browser.geekbench.com/v5/cpu/2412288
 
 ## Working
 
@@ -37,74 +28,13 @@ https://browser.geekbench.com/v5/cpu/2412288
 
 - **Ethernet**: Intel I225-V 2.5Gb
 
-  1. Add device property:  
-
-     ```xml
-     <dict>
-     	<key>PciRoot(0x0)/Pci(0x1C,0x1)/Pci(0x0, 0x0)</key>
-     	<dict>
-     		<key>device-id</key>
-     		<data>8hUAAA==</data>
-     	</dict>
-     </dict>
-     ```
-     
-  2. Create custom FakeID-kext "FakePCIID_Intel_I225-V.kext".
-
-- **dGPU**: RX 580 8GB.  
-  Works OOB, supports HiDPI in 4K display. DRM also works with `shikigva=80` in boot-args.
-
-- **iGPU**: UHD 630 (headless mode + dGPU)  
-  Using ```AAPL,ig-platform-id: 0300923E``` and everything works OOB.  
-  Sidecar tested by [rjenny509](https://www.reddit.com/r/hackintosh/comments/h7nctk/first_hackintosh_was_a_success_i7_10700k_rx5700xt/fumlvl9/)
-
-- **Bluetooth & Wi-Fi**: Fenvi T919  
-  Works OOB. Bluetooth's internal USB port needs to be configured in custom UIAC.aml.
+- **iGPU**: UHD 630. Working two 4K displays (But laggy a bit). No DRM in Safari.
 
 - Native NVRAM
 
 - Sleep/Wake
 
 - Reboot/Shutdown
-
-## Not/Partially Working
-
-- iGPU UHD-630
-
-  1. Using only iGPU:
-      ```
-      AAPL,ig-platform-id: 07009B3E
-      ```  
-
-     - ~~Safari can't open www.fb.com~~  
-     - ~~Firefox quit when opening~~  
-     - ~~VMware Fusion display problem (VM quit when loading vmware tool's display driver)~~  
-     - ~~Can't change account profile picture~~  
-     - Problems above are fixed after removing frambuffer patch
-     - iGPU HDMI output not working (Displayport is fine)
-  
-  2. Using iGPU + dGPU:   
-    Doesn't show UHD 630 in SystemReport/Graphics    
-    
-      1. AAPL,ig-platform-id: 07009B3E  
-    
-          ```
-          AAPL,ig-platform-id: 07009B3E
-          ```
-        - Long boot time (about 30~40 seconds)
-        - iGPU HDMI output not working (Displayport is fine)
-        - iGPU successfuly tested in Geekbench 5 (https://browser.geekbench.com/v5/compute/1021988)  
-    
-
-
-      2. AAPL,ig-platform-id: 0300923E (**Current setting**)
-
-          ```AAPL,ig-platform-id: 0300923E```  
-        Fully working.
-
-- DRM
-
-    DRM not working in Big Sur beta, Catalina works.
 
 
 ## USB Ports
@@ -139,34 +69,16 @@ Layout-id and device-id is injected via the device properties.
 	</dict>
 ```
 
-## Bluetooth/Wi-Fi
-
-Work OOB. Wi-Fi, bluetooth, airdrop and handoff works.
-
-## CFG-Lock
-
-- Before  
-
-  Can't unlock CFG-lock. So I enabled `AppleCpuPmCfgLock` and `AppleXcpmCfgLock` in order to boot.
-
-  I followed https://dortania.github.io/OpenCore-Desktop-Guide/extras/msr-lock.html. But error occurs when extracting exported bin file. I guess it's beacuse of the strange BIOS map on this board.
-
-  ![ifrextract](Photos/ifrextract.png)
-
-- Now  
-
-  ~~Unlocked CFG-Lock via `CFGLock.efi`, thanks to [this post](https://www.tonymacx86.com/threads/gigabyte-z490-vision-d-thunderbolt-3-i5-10400-amd-rx-580.298642/). So `AppleCpuPmCfgLock` and `AppleXcpmCfgLock` is disabled.~~  
-  Updated BIOS to version F6, it have native CFG Lock switcher in BIOS menu.
 
 ## BIOS Setting
 
 - Disable
-  - FastBoot
   - CSM Support
   - Secure Boot
+  - CFG Lock
 - Enable
   - VT-x
-  - VT-d (Enable **DisableIoMapper** in config.plist)
+  - VT-d
   - Above 4G Decoding
   - Hyper-Threading
   - Onboard GPU Memory: 64MB
@@ -175,6 +87,8 @@ Work OOB. Wi-Fi, bluetooth, airdrop and handoff works.
 ## Credits
 
 - [Apple](https://www.apple.com) : Awesome macOS
-- [Acidanthera](https://github.com/acidanthera) : OpencorePkg, kexts, tools etc.	
+- [Acidanthera](https://github.com/acidanthera) : OpencorePkg, kexts, tools etc.
 - [Dortania](https://github.com/dortania) : Opencore guide
-- https://github.com/SchmockLord/Hackintosh-Intel-i9-10900k-Gigabyte-Z490-Vision-D : Intel 2.5Gb I225-V and onboard audio tweaks
+- [headkaze](https://github.com/headkaze/Hackintool) : Hackintool
+- [samuel21119](https://github.com/samuel21119/Intel-i7-10700-Gigabyte-Z490-Vision-G-Hackintosh) : Base for Configuration
+- [augstb](https://github.com/augstb/Hackintosh-Intel-i7-10700k-Gigabyte-Z490-Vision-G) : iGPU reference
